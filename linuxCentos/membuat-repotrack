@@ -1,0 +1,20 @@
+repotrack
+------------------------
+(jika belum melakukan install repotrack jalankan perintah berikut)
+yum install yum-utils 
+---------------------------------------------------------------------------
+mkdir folder
+repotrack -a x86_64 -p /folder packages (nama packages yang ini di ambil)
+yum makecache
+yum install createrepo
+createrepo /folder (nama folder reponya)
+
+vi /etc/yum.repos.d/localrepo.repo
+[localrepo]
+name=localrepo
+baseurl=file:///folder (nama folder reponya)
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+yum install --disablerepo="*" --enablerepo="localrepo" packages
