@@ -1,0 +1,46 @@
+CATATAN DOCKER
+---------------------------------------------------------------------------------
+*DOCKER CONTAINER
+- docker container ls (untuk menampilkan docker container yang berjalan)
+- docker container ls --all (untuk menampilkan docker container yang berjalan dan tidak berjalan)
+cara membuat docker container
+- docker container create --name (nama container) (nama images:versi images)
+cara menjalankan docker container
+- docker container start (nama container)
+cara stop docker container
+- docker container stop (nama container)
+cara menghapus container
+- docker container rm (nama container)
+---------------------------------------------------------------------------------
+
+*LOG
+untuk menampilkan Log pada docker
+- docker container logs (menampilkan log pada container)
+- docker container logs -f (menampilkan Live log pada container)
+---------------------------------------------------------------------------------
+
+*CONTAINER EXEC
+untuk masuk ke dalam docker container
+- docker container exec -i -t redissvr /bin/bash
+---------------------------------------------------------------------------------
+
+*CONTAINER PORT
+cara merubah port pada container
+- docker container create --name (nama container) -p (port yang ingin digunakan):(port default container ) (nama image:versi image)
+---------------------------------------------------------------------------------
+
+*DOCKER CONTAINER ENVIRONMENT VARIABLE
+- docker container create --name mongo1 -p 8181:27017 --env MONGO_INITDB_ROOT_USERNAME=malik --env MONGO_INITDB_ROOT_PASSWORD=P@ssw0rd mongo:5.0
+---------------------------------------------------------------------------------
+
+*DOCKER CONTAINER STATS
+untuk melihat penggunaan resource dari setiap container yang berjalan
+- docker container stats
+---------------------------------------------------------------------------------
+
+*DOCKER CONTAINER LIMIT
+untuk melimit resurce memory dan cpu pada docker container
+- docker container create --name testnginx -p 8080:80 --memory 100m --cpus 0.5 nginx:latest
+---------------------------------------------------------------------------------
+
+*BIND MOUNTS
