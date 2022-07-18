@@ -1,0 +1,5 @@
+https://kb.paessler.com/en/topic/16203-creation-of-users-for-a-specific-device-monitoring
+https://kb.paessler.com/en/topic/52873-limitation-of-access-to-sections-for-external-customers
+https://kb.paessler.com/en/topic/59796-how-do-i-provide-a-view-only-interface-for-specific-sensors-for-an-individual-user
+https://kb.paessler.com/en/topic/83073-restrict-view-for-specific-users
+https://kb.paessler.com/en/topic/74877-limit-on-users-accessing-prtg-maps
