@@ -1,4 +1,4 @@
-Tolong buatin Account VPN atas nama Test
+Membuat openvpn client 
 
 -----------------Command nya ---------------------
 cd /etc/openvpn/easy-rsa
@@ -29,11 +29,3 @@ ta.key mulai dari -----BEGIN OpenVPN Static key V1----- sampe Ke -----END OpenVP
 
 
 ------------------
-IP: 103.141.40.226
-U : 
-Pass: DQ311285Qz022389@!&
-SSH Port 
-
-Kalau sudah, expot Test.opvn ke laptop dan import ke aplikasi openvpn d laptop, sampe bisa konek.
-
-kl sudah konek. tolong remote server vpn nya dan commandnya : tail  -f /var/log/openvpn.log
