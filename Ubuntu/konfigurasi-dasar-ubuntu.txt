@@ -1,0 +1,51 @@
+- install ssh jika belum ada
+  sudo apt-get install openssh-server nmap
+
+- jalankan ssh
+  sudo service ssh start
+
+- edit ssh
+  sudo vi /etc/ssh/sshd_config
+
+- restart ssh
+  sudo systemctl restart sshd.service
+
+- cek status ssh
+  sudo systemctl status sshd.service
+
+- aktifkan fire wall
+  sudo ufw status verbose
+  sudo ufw enable
+  sudo ufw status verbose
+  sudo ufw allow 2332/tcp
+  sudo ufw status verbose
+
+- cek ip 
+  ip a
+
+selanjutnya cek bisa di remote
+
+
+-cara install nginx di ubuntu
+ sudo apt install nginx
+ sudo systemctl status nginx
+ sudo ufw allow 'Nginx Full'
+ sudo ufw status 
+
+-cara install php 
+sudo apt install php-fpm php-mysql
+sudo nano index.php 
+<?php
+	phpinfo();
+?>
+sudo nano /etc/nginx/sites-avalible/default	
+tambah index.php
+location ~ \.php$ {
+ include snippets/fastcgi-php.conf;
+ fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+}
+
+-cara install mysql
+sudo apt install mysql-server mysql-client
+sudo mysql_secure_installation
+sudo mysql -u root -p
