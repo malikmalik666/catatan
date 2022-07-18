@@ -1,4 +1,4 @@
-buat file .htm
+buat file .htm (di text editor)
 masukan skrip berikut:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 <!--Data Tables: DOWN Sensors (Sorted by Down Since)-->
