@@ -1,0 +1,32 @@
+buat file .htm
+masukan skrip berikut:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<!--Data Tables: DOWN Sensors (Sorted by Down Since)-->
+
+<div class="map_object map_table" id="<@itemid>" objectid="<@objectid>" subid="<@subid>" style="overflow:auto;<#mapobject type="coordinates" subid="<@subid>" mode="<@editmode>">">
+  <#mapobject type="objectgrip" mode="<@editmode>">
+  <#mapobject type="htmlbefore" subid="<@subid>">
+  <#checkobjecttype objecttype="probenode,group,device" nicemessage="true" id="<@objectid>">
+
+  <div class="maptablecontainer" style="overflow:hidden">
+    <#lang key="html.mapobjects.tablea1.tabletitle" default="DOWN Sensors (@@@@)" var="tabletitle">
+    <#table tableid="sensortable"
+    id="<@objectid>"
+    content="sensors"
+    columns="sensor,probegroupdevice,status,downtimesince,lastvalue,message"
+    sortby="-downtimesince"
+    infoheader="false"
+    links="false"
+    sortable="false"
+    varexpand="tabletitle"
+    tabletitle="@tabletitle"
+    filter_tags="@tag(<@tagfilterstring>)"
+    filter_status="5"
+    filter_status="13"
+    filter_status="14"
+    >
+  </div>
+  <#mapobject type="htmlafter" subid="<@subid>">
+</div>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+jika sudah simpan file di folder C:\Program Files (x86)\PRTG Network Monitor\webroot\mapobjects\
