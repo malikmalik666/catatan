@@ -1,0 +1,39 @@
+Tolong buatin Account VPN atas nama Test
+
+-----------------Command nya ---------------------
+cd /etc/openvpn/easy-rsa
+sudo ./easyrsa gen-req Test
+
+Password Tesnya : QudibRe+h@f7at=u
+
+sudo ./easyrsa sign-req client Test
+
+Password CA : YhZ=TFM2F=LEaPUN!=
+
+sudo mkdir -p /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/private/Test.key /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/issued/Test.crt /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/ca.crt /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/ta.key /etc/openvpn/client/Test
+sudo cp /etc/openvpn/client.conf /etc/openvpn/client/Test/Test.ovpn
+sudo su
+cd /etc/openvpn/client/Test
+ls -al
+-----------------Command nya ---------------------
+
+nano etc/openvpn/client/	
+Test.key mulai dari -----BEGIN ENCRYPTED PRIVATE KEY----- sampe Ke -----END ENCRYPTED PRIVATE KEY----- di copas ke <key>......</key>
+Test.crt mulai dari -----BEGIN CERTIFICATE----- sampe Ke -----END CERTIFICATE di copas ke <cert>......</cert>
+ca.crt mulai dari -----BEGIN CERTIFICATE----- sampe Ke -----END CERTIFICATE----- di copas ke <ca>......</ca>
+ta.key mulai dari -----BEGIN OpenVPN Static key V1----- sampe Ke -----END OpenVPN Static key V1---- di copas ke <tls-auth>......<tls-auth>
+
+
+------------------
+IP: 103.141.40.226
+U : 
+Pass: DQ311285Qz022389@!&
+SSH Port 
+
+Kalau sudah, expot Test.opvn ke laptop dan import ke aplikasi openvpn d laptop, sampe bisa konek.
+
+kl sudah konek. tolong remote server vpn nya dan commandnya : tail  -f /var/log/openvpn.log
