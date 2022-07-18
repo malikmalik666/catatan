@@ -1,0 +1,11 @@
+Tentang routing di centos 7
+-----------------------------------------------------------------------------------------
+#command meliat routing dan matric
+ip r
+
+#command menambahkan matric
+IPV4_ROUTE_METRIC=301
+
+#command menambah routing
+vi route-(nama port)
+103.154.172.0/24(ip tujuan) via 103.154.172.233(gateway tujuan) dev em1(nama port)
