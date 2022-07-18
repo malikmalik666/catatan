@@ -1,0 +1,25 @@
+#blockir web menggunakan unbound dns
+Note: Terlebih dahulu install dns unbound, jika sudah lakukan perintah berikut
+---------------------------------------------------------------------------------------------------
+cd /etc/unbound/local.d/
+vi block.conf
+#masukan teks berikut
+local-zone: "(nama web)" redirect
+local-data: "(nama web) A 127.0.0.1"
+local-zone: "(nama web)" redirect
+local-data: "(nama web) A 127.0.0.1"
+
+chroot -x root:unbound /etc/unbound/local.d/
+chown -R root:unbound /etc/unbound/local.d/
+
+#check konfigurasi unbound sudah benar atau belum
+unbound-checkconf /etc/unbound/unbound.conf
+
+#masuk ke /tmp
+wget ftp://FTP.INTERNIC.NET/domain/named.cache
+wget ftp://FTP.INTERNIC.NET/domain/named.cache -O /var/lib/unbound/named.cache
+
+#Copy file named.cache ke direktori /var/lib/unbound/.
+cp named.cache /var/lib/unbound/named.cache
+
+systemctl start unbound.service
