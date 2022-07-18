@@ -1,0 +1,375 @@
+Set up OpenVPN on CentOS 7 dengan RSA-TLS V1.2 With Transport Autentication
+
+File /etc/hosts
+isinya ( Misal )
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+103.154.172.242  localhost.localdomain
+
+File NIC ( misal; ifcfg-bond0 )
+
+DEVICE=bond0
+NAME=bond0
+TYPE=Bond
+BONDING_MASTER=yes
+ONBOOT=yes
+BOOTPROTO=none
+BONDING_OPTS="downdelay=0 miimon=100 mode=4 updelay=0"
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+IPADDR=103.154.172.242
+NETMASK=255.255.255.252
+GATEWAY=103.141.40.225
+DNS1=103.141.40.250
+DNS2=103.141.40.254
+DNS3=8.8.8.8
+PROXY_METHOD=none
+BROWSER_ONLY=no
+DOMAIN=localhost.localdomain
+ZONE=public
+---------------------------------------------------
+Lalu selinux disable
+
+Dan konfigurasi firewalld atau firewall-cmdnya :
+
+public (active)
+  target: default
+  interfaces: bond0 em1 em2
+  services: dhcpv6-client dns http https openvpn ssh # ini service yang dia allow
+  ports: 2332/tcp 953/tcp 53/tcp 1194/tcp 953/udp 53/udp 1194/udp 80/tcp 443/tcp # ini port yang dia allow
+  protocols:
+  masquerade: yes
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+================================
+Persyaratan / TAHAPAN KONFIGURASINYA
+CENTOS 7 64BIT, REDHAT ETNTERPRISE 7 ENTERPRISE SERVER 7 64BIT
+
+update dulu centos atau redhat servernya :
+yum -y update
+--------------------------
+Install repository dan binari/package yang diperlukan
+sudo yum -y install epel-release
+sudo yum -y install nano wget curl ntp openvpn easy-rsa zip
+============================
+LANJUT:
+
+Set up ntpd
+Command : timedatectl list-timezones
+sudo timedatectl set-timezone Asia/Jakarta
+sudo systemctl start ntpd
+sudo systemctl enable ntpd
+
+============================
+Set up easy-rsa, build CA, pembuatan server sertificat
+Command :
+
+sudo mkdir /etc/openvpn/easy-rsa
+sudo cp -r /usr/share/easy-rsa/3/* /etc/openvpn/easy-rsa
+
+cd /etc/openvpn/easy-rsa
+sudo ./easyrsa init-pki
+
+init-pki complete; you may now create a CA or requests.
+Your newly created PKI dir is: /etc/openvpn/easy-rsa/pki
+Then we build the CA
+
+==================================
+NEXT:
+
+sudo ./easyrsa build-ca
+Generating a 2048 bit RSA private key
+………………………………………………………………………………+++
+……………………………………………………………………………………………………+++
+writing new private key to ‘/etc/openvpn/easy-rsa/pki/private/ca.key.sUhZXYUixU’
+Enter PEM pass phrase: YhZ=TFM2F=LEaPUN!=
+
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter ‘.’, the field will be left blank.
+—–
+Common Name (eg: your user, host, or server name) [Easy-RSA CA]: localhost.localdomain ( misalnya )
+
+==============================================
+Next:
+sudo ./easyrsa gen-req localhost.localdomain nopass
+
+Generating a 2048 bit RSA private key
+…..+++
+………………………………………..+++
+writing new private key to ‘/etc/openvpn/test2/pki/private/localhost.localdomain.key.5wDxc6WQee’
+—–
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter ‘.’, the field will be left blank.
+—–
+Common Name (eg: your user, host, or server name) [localhost.localdomain]: 
+
+Press enter to complete the command
+======================================
+
+NEXT:
+sudo ./easyrsa sign-req server localhost.localdomain
+
+You are about to sign the following certificate.
+Please check over the details shown below for accuracy. Note that this request
+has not been cryptographically verified. Please be sure it came from a trusted
+source or that you have verified the request checksum with the sender.
+
+Request subject, to be signed as a server certificate for 3650 days:
+
+subject=
+commonName = localhost.localdomain
+
+Type the word ‘yes’ to continue, or any other input to abort.
+Confirm request details: KETIK YES DAN ENTER  ========
+
+Using configuration from ./openssl-1.0.cnf
+Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key:
+Check that the request matches the signature
+Signature ok
+The Subject’s Distinguished Name is as follows
+commonName :ASN.1 12:’localhost.localdomain’
+Certificate is to be certified until Jul 16 15:09:21 2028 GMT (3650 days)
+
+Write out database with 1 new entries
+Data Base Updated
+
+Certificate created at: /etc/openvpn/easy-rsa/pki/issued/localhost.localdomain.crt
+================================================
+Lalu buat Diffie–Hellman key:
+
+sudo ./easyrsa gen-dh
+
+Generating DH parameters, 2048 bit long safe prime, generator 2
+This is going to take a long time
+……..+…………………………………………….+……..
+…+………………..+………………………………………
+…..+…………………….+………………………………..
+
+DH parameters of size 2048 created at /etc/openvpn/test2/pki/dh.pem
+
+======================================
+sudo openvpn --genkey --secret /etc/openvpn/easy-rsa/pki/ta.key
+openvpn --genkey --secret /etc/openvpn/easy-rsa/pki/ta.key
+set interfaces openvpn vtun0 hash sha256
+set interfaces openvpn vtun0 openvpn-option '--comp-lzo'
+set interfaces openvpn vtun0 openvpn-option '--tls-auth ta.key 0'
+===================================================================
+Configure OpenVPN
+
+sudo nano /etc/openvpn/server.conf
+#=================ISINYA KONFIGURASINYA SEBAGAI BERIKUT==================#	
+tls-server
+mode server
+client-to-client
+local 103.154.172.242
+port 1194
+proto udp4
+dev tun
+ca /etc/openvpn/easy-rsa/pki/ca.crt
+cert /etc/openvpn/easy-rsa/pki/issued/localhost.localdomain.crt
+key /etc/openvpn/easy-rsa/pki/private/localhost.localdomain.key
+dh /etc/openvpn/easy-rsa/pki/dh2048.pem
+tls-auth /etc/openvpn/easy-rsa/pki/ta.key
+cipher AES-256-CBC 
+tls-version-min 1.2
+tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-128-CBC-SHA256
+auth SHA256
+auth-nocache
+comp-lzo yes
+compress lz4-v2
+push "compress lz4-v2"
+daemon
+topology subnet
+server 10.50.0.0 255.255.255.0
+mssfix
+sndbuf 393216
+rcvbuf 393216
+push "sndbuf 393216"
+push "rcvbuf 393216"
+float
+
+fast-io
+ifconfig-pool-persist ipp.txt
+push "redirect-gateway def1 bypass-dhcp"
+push "dhcp-option DNS 8.8.8.8"
+push "dhcp-option DNS 8.8.4.4"
+keepalive 10 120
+max-clients 65534
+user nobody
+group nobody
+persist-key
+persist-tun
+log /var/log/openvpn.log
+status /var/log/openvpn-status.log
+mute 20
+verb 3
+explicit-exit-notify 1
+#==============================END===============================#
+KONFIGURASI FIREWALL ( FIREWALLD/FIREWALL-CMD )
+
+sudo firewall-cmd --get-active-zones
+public
+interfaces: bond0
+-----------------------------------
+sudo firewall-cmd --zone=public --change-interface=bond0
+sudo firewall-cmd --zone=public --add-service openvpn
+sudo firewall-cmd --zone=public --add-service openvpn --permanent
+sudo firewall-cmd --add-masquerade
+sudo firewall-cmd --add-masquerade --permanent
+sudo firewall-cmd --direct --passthrough ipv4 -t nat -A POSTROUTING -s 10.50.0.0/24 -o bond0 -j MASQUERADE
+sudo firewall-cmd --permanent --direct --passthrough ipv4 -t nat -A POSTROUTING -s 10.50.0.0/24 -o bond0 -j MASQUERADE
+sudo firewall-cmd --zone=public --add-service http --permanent
+sudo firewall-cmd --zone=public --add-service https --permanent
+sudo firewall-cmd --zone=public --add-service dns --permanent
+sudo firewall-cmd --zone=public --add-service ssh --permanent
+sudo firewall-cmd --zone=public --add-port=1194/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=1194/udp --permanent
+sudo firewall-cmd --zone=public --add-port=953/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=5353/udp --permanent
+sudo firewall-cmd --zone=public --add-port=2331/tcp --permanent
+sudo firewall-cmd --reload
+sudo firewall-cmd --complete-reload
+======================================================
+sudo nanao /etc/sysctl.conf
+File configururasinya :
+#=============BEGIN==================#
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv4.ip_forward = 1
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.default.accept_source_route = 0
+kernel.sysrq = 0
+kernel.core_uses_pid = 1
+net.ipv4.tcp_syncookies = 1
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+kernel.sem = 250 32000 100 128
+fs.file-max = 200500
+vm.dirty_expire_centisecs=60000
+vm.dirty_background_ratio=80
+vm.dirty_ratio=90
+#=============END==================#
+sudo systemctl restart network.service
+===========================================
+Start The OpenVPN Server
+
+sudo systemctl -f enable openvpn@server.service
+Created symlink from /etc/systemd/system/multi-user.target.wants/openvpn@server.service to /usr/lib/systemd/system/openvpn@.service.
+sudo systemctl start openvpn@server.service
+===================================================
+Configure Client Files ( Misal: nama client nya Test "case sensitive / hurup kecil dan hurup besar dalam pembuatan nama/account, folder, dan password berpengaruh"
+
+cd /etc/openvpn/easy-rsa
+sudo ./easyrsa gen-req Test
+
+Generating a 2048 bit RSA private key
+…………………………………+++
+…+++
+writing new private key to ‘/etc/openvpn/easy-rsa/pki/private/Test.key.bKBo7Y6MNQ’
+Enter PEM pass phrase:
+
+Verifying – Enter PEM pass phrase: 123415141414141@!$ ( ini password untuk si Test, untuk mengakses account VPN nya
+
+ommon Name (eg: your user, host, or server name) [Test]:
+
+Keypair and certificate request completed. Your files are:
+req: /etc/openvpn/easy-rsa/pki/reqs/Test.req
+key: /etc/openvpn/easy-rsa/pki/private/Test.key
+
+sudo ./easyrsa sign-req client Test
+
+You are about to sign the following certificate.
+Please check over the details shown below for accuracy. Note that this request
+has not been cryptographically verified. Please be sure it came from a trusted
+source or that you have verified the request checksum with the sender.
+
+Request subject, to be signed as a client certificate for 3650 days:
+
+subject=
+commonName = Test
+=======
+Type the word ‘yes’ to continue, or any other input to abort.
+Confirm request details: yes
+Using configuration from ./openssl-1.0.cnf
+Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key:
+Check that the request matches the signature
+Signature ok
+The Subject’s Distinguished Name is as follows
+commonName :ASN.1 12:’Test’
+Certificate is to be certified until Aug 26 19:10:42 2028 GMT (3650 days)
+
+Write out database with 1 new entries
+Data Base Updated
+
+Certificate created at: /etc/openvpn/easy-rsa/pki/issued/Test.crt
+=======================================================
+Next edit contoh configuration file for OpenVPN clients
+sudo cp /usr/share/doc/openvpn-2.4.7/sample/sample-config-files/client.conf /etc/openvpn/client.conf
+sudo nano /etc/openvpn/client.conf
+
+#===========================BEGIN============================#
+client
+dev tun
+proto udp4
+remote 103.154.172.242 1194
+resolv-retry infinite
+nobind
+auth-nocache
+mssfix
+persist-key
+persist-tun
+float
+fast-io
+mute-replay-warnings
+<ca>
+-----BEGIN CERTIFICATE-----
+
+-----END CERTIFICATE-----
+</ca>
+<cert>
+-----BEGIN CERTIFICATE-----
+
+-----END CERTIFICATE-----
+</cert>
+<key>
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+
+-----END ENCRYPTED PRIVATE KEY-----
+</key>
+<tls-auth>
+-----BEGIN OpenVPN Static key V1-----
+
+-----END OpenVPN Static key V1-----
+</tls-auth>
+remote-cert-tls server
+cipher AES-256-CBC 
+tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-128-CBC-SHA256
+auth SHA256
+auth-nocache
+tls-version-min 1.2
+compress lzo
+compress lz4-v2
+verb 3
+mute 20
+#===========================END============================#
+
+sudo mkdir -p /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/private/Test.key /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/issued/Test.crt /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/ca.crt /etc/openvpn/client/Test
+sudo cp /etc/openvpn/easy-rsa/pki/ta.key /etc/openvpn/client/Test
+sudo cp /etc/openvpn/client.conf /etc/openvpn/client/Test/Test.ovpn
+sudo su
+cd /etc/openvpn/client/Test
+ls -al
