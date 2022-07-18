@@ -1,0 +1,28 @@
+--------------Konfigurasi ssh--------------------
+vi /etc/ssh/sshd.config				
+ubah Port 					
+PremitRootLogin yes				
+/etc/rc.d/sshd restart				
+-------------------------------------------------
+sysrc apache24_enable="yes"
+-----------cara mengaktifkan service------------
+vi /etc/rc.conf
+Tambahkan Service yang diinginkan
+-(nama service)_enable="YES"
+Menjalankan service
+-/etc/rc.d/(nama service)start
+Menghentikan service
+-/etc/rc.d/(nama service)stop
+Melihat status service
+-/etc/rc.d/(nama service)status
+Restart service
+-/etc/rc.d/(nama service)restart
+------------------------------------------------
+
+--------------install nginx--------------------
+pkg install nginx
+sysrc nginx_enable="yes"
+service nginx start
+service nginx status
+-----------------------------------------------
+
