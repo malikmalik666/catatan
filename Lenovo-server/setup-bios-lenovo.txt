@@ -1,0 +1,23 @@
+----------CMM---------------
+power on , action lauch
+f1(system setup)
+lauch graphical system setup
+
+
+-------SETUP BIOS-----------
+RAID Setup 
+-Manage Disk Drivers 
+-Change all disk drives state from JBOD to UGood
+-Advanced configuration 
+-Raid 1
+
+UEFI Setup
+BMC setting
+-Ethernet over USB Interface disabled
+
+-Boot manager 
+ add generik (klik)
+ usb Storage
+change boot order 
+ urutan = hdd , cd , usb , network
+ commit change and exit
