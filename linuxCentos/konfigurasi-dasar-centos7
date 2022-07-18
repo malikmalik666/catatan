@@ -1,0 +1,21 @@
+Konfigurasi dasar Centos7
+----ubah Selinux menjadi disabled----
+-vi /etc/sysconfig/selinux ubah SELINUX menjadi (disabled)
+
+-----setup Ip (menggunakan nmtui)-----
+ketik nmtui
+- edit a connection
+  edit
+  ceklis never use this network for default route
+  lalu ok
+
+-----cara menambah port ssh-----
+- vi /etc/ssh/sshd_config
+  tambah Port sesuai inginan
+  hapus # pada PermitRootLogin
+  systemctl restat sshd.service
+  lalu cek status, systemctl status sshd.service
+
+-----setup firewall----
+- firewall-cmd --permanent --add-port=(seusai dengan port)/tcp
+- kemudian reload firewall, firewall-cmd --reload
