@@ -1,0 +1,8 @@
+Untuk melihat tabel routing nya, gunakan perintah :
+route -n
+--------------------------------------------------------------------------------------------------------
+menambah routing permanent
+edit file /etc/network/interfaces
+Tambahkan baris berikut :
+post-up route add -net 192.168.21.0(ip yang akan di routing) netmask 255.255.255.0 (netmask ip) gw 192.168.0.99 (gateway ip)
+---------------------------------------------------------------------------------------------------------
