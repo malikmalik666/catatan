@@ -8,4 +8,4 @@ IPV4_ROUTE_METRIC=301
 
 #command menambah routing
 vi route-(nama port)
-103.154.172.0/24(ip tujuan) via 103.154.172.233(gateway tujuan) dev em1(nama port)
+1.1.1.0/24(ip tujuan) via 1.1.1.1(gateway tujuan) dev em1(nama port)
