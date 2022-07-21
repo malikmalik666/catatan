@@ -1,0 +1,149 @@
+Langkah-langkah install dan konfigurasi syslog server menggunakan Graylog di centos 7
+--------------------------------------------------------------------------------------------------------
+yum -y install epel-release
+yum -y update
+yum -y install wget pwgen
+
+-install java opendjk
+yum install -y java-1.8.0-openjdk-headless
+
+cek versi java dengan command berikut
+java -version
+
+openjdk version "1.8.0_332"
+OpenJDK Runtime Environment (build 1.8.0_332-b09)
+OpenJDK 64-Bit Server VM (build 25.332-b09, mixed mode)
+Jika tampil keterangan seperti di atas berarti java sudah berhasil terinstall
+---------------------------------------------------------------------------------------------------------
+-Install Elasticsearch
+Import the GPG dengan command berikut :
+rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+Membuat repository Elasticsearch dengan command berikut :
+vi /etc/yum.repos.d/elasticsearch.repo
+
+kemudian masukan perintah berikut :
+[elasticsearch-6.x]
+name=Elasticsearch repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+jika sudah, kita bisa melakukan installasi Elasticsearch dengan menjalankan command berikut
+yum install -y elasticsearch
+
+Muat ulang daemon systemctl dan aktifkan Elasticsearch untuk memulai secara otomatis pada startup sistem
+systemctl daemon-reload
+systemctl enable elasticsearch
+
+Untuk membuat Elasticsearch bekerja dengan pengaturan Graylog, kita perlu mengatur nama cluster menjadi graylog. Edit file elasticsearch.yml.
+vi /etc/elasticsearch/elasticsearch.yml
+
+ubah di bagian #cluster.name: my-application, menjadi cluster.name: graylog
+jika sudah simpan, lalu restart Elasticsearch dengan command berikut :
+systemctl restart elasticsearch
+
+cek apakah Elasticsearch sudah berjalan di http port 9200 dengan command berikut:
+curl -X GET http://localhost:9200
+
+jika muncul tambilan seperti di bawah ini berarti kita sudah berhasil melakukan installasi dan konfigurasi Elasticsearch
+{
+  "name" : "vP3jMw3",
+  "cluster_name" : "graylog",
+  "cluster_uuid" : "IOJgCM_rTeGupFiDGIC4NQ",
+  "version" : {
+    "number" : "6.8.23",
+    "build_flavor" : "default",
+    "build_type" : "rpm",
+    "build_hash" : "4f67856",
+    "build_date" : "2022-01-06T21:30:50.087716Z",
+    "build_snapshot" : false,
+    "lucene_version" : "7.7.3",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+---------------------------------------------------------------------------------------------------------
+-Install MongoDB
+Masukan commnad berikut untuk membuat repostory MongoDB 
+vi /etc/yum.repos.d/mongodb-org-4.0.repo
+
+Jika sudah masukan masukan repository berikut :
+
+[mongodb-org-4.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
+
+lakukan installasi MongoDB dengan menjalankan perintah berikut :
+yum install -y mongodb-org
+
+lakukan start service MongoDB dengan perintah berikut :
+systemctl start mongod
+systemctl enable mongod
+---------------------------------------------------------------------------------------------------------
+-Install Graylog
+Download dan install graylog repository dengan command berikut :
+rpm -Uvh https://packages.graylog2.org/repo/packages/graylog-4.2-repository_latest.rpm
+yum -y install graylog-server
+
+jalankan peritah berikut untuk membuat secret code
+pwgen -N 1 -s 96
+maka akan muncul code seperti di bawah ini :
+63XSsg8uM5QUVMm5PUYwnvdup3jW3MiB57rhNZnyckkhqz5vvvWqa4qGP0vjvmIjHgZIf0ieAxYv4RTg8VpUIxNlxgZYFB79
+
+input code yang yang sudah kita buat di :
+vi /etc/graylog/server/server.conf
+lalu cari baris password_secret =
+masukan code yang kita buat sebelumnya
+Contoh 
+password_secret = 63XSsg8uM5QUVMm5PUYwnvdup3jW3MiB57rhNZnyckkhqz5vvvWqa4qGP0vjvmIjHgZIf0ieAxYv4RTg8VpUIxNlxgZYFB79
+Kemudian simpan
+
+kita akan membuat password admin graylog dengan jalankan perintah berikut
+echo -n (password anda) | sha256sum
+akan muncul code seperti di bawah ini
+b03ddf3ca2e714a6548e7495e2a03f5e824eaac9837cd7f159c67b90fb4b7342
+
+input code yang yang sudah kita buat di :
+vi /etc/graylog/server/server.conf
+lalu cari baris root_password_sha2 =
+masukan code yang kita buat sebelumnya
+Contoh 
+root_password_sha2 = b03ddf3ca2e714a6548e7495e2a03f5e824eaac9837cd7f159c67b90fb4b7342
+
+lalu kita akan melakukan konfigurasi lain pada baris:
+root_timezone = (sesuaikan waktu daerah kita), misal Asia/Jakarta
+is_master = true
+elasticsearch_max_docs_per_index = 20000000
+elasticsearch_max_number_of_indices = 20
+elasticsearch_shards = 1
+elasticsearch_replicas = 0
+http_bind_address = (ipserver kita):9000
+
+kemudian save dan jalan kan perintah berikut untuk start service graylog
+systemctl daemon-reload
+systemctl restart graylog-server
+systemctl enable graylog-server
+
+Anda dapat memeriksa log startup server dengan command 
+tailf /var/log/graylog-server/server.log
+
+Jika semuanya berjalan dengan baik, Anda akan melihat pesan di bawah ini di file server.log.
+2019-02-25T21:00:23.157+05:30 INFO  [ServerBootstrap] Graylog server up and running.
+------------------------------------------------------------------------------------------------------------
+-Konfigurasi Firewall
+jalankan perintah berikut untuk membuka port graylog
+firewall-cmd --permanent --add-port=9000/tcp
+firewall-cmd --reload
+------------------------------------------------------------------------------------------------------------
+Akses antarmuka web Graylog dengan web browser dengan cara :
+http://(ip server):9000
+masukan user admin dan password yang sudah kita buat
+
