@@ -7,5 +7,5 @@ ip r
 IPV4_ROUTE_METRIC=301
 
 #command menambah routing
-vi route-(nama port)
-1.1.1.0/24(ip tujuan) via 1.1.1.1(gateway tujuan) dev em1(nama port)
+vi route-(nama Interface NIC)
+1.1.1.0/24(ip tujuan) via 1.1.1.1(gateway tujuan/ gateway server) dev em1(nama interface NIC)
