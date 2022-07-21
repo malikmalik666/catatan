@@ -150,4 +150,5 @@ firewall-cmd --reload
 Akses antarmuka web Graylog dengan web browser dengan cara :
 http://(ip server):9000
 masukan user admin dan password yang sudah kita buat
+jika web graylog tampil maka kita sudah berhasil membuat server syslog menggunakan Graylog :D 
 
