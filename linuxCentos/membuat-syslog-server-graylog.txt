@@ -46,6 +46,10 @@ ubah di bagian #cluster.name: my-application, menjadi cluster.name: graylog
 jika sudah simpan, lalu restart Elasticsearch dengan command berikut :
 systemctl restart elasticsearch
 
+tambahkan port 9200 di firewall dengan command berikut
+firewall-cmd --permanent --add-port=9200/tcp
+firewall-cmd --reload
+
 cek apakah Elasticsearch sudah berjalan di http port 9200 dengan command berikut:
 curl -X GET http://localhost:9200
 
