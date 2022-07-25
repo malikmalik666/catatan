@@ -1,0 +1,15 @@
+Konfugurasi syslog client pada centos 7
+---------------------------------------------------
+Konfigurasi rsyslog
+--------------------------------------------------------------------------------------------------------------
+jalankan perintah berikut :
+vi /etc/rsyslog.conf
+lalu masukan command di bawah ini
+$template GRAYLOGRFC5424,"%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% %msg%\n"
+*.* @103.157.144.210:(port graylog);GRAYLOGRFC5424
+systemctl restart rsyslog
+--------------------------------------------------------------------------------------------------------------
+Konfigurasi firewall
+tambah port yang berjalan di graylog server dengan perintah berikut :
+firewall-cmd --permanent --add-port=(port graylog server)/udp
+firewall-cmd --reload
