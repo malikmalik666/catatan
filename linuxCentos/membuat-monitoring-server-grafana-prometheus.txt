@@ -1,0 +1,43 @@
+langkah-langkah membuat server monitoring menggunakan grafana prometeus
+---------------------------------------------------------------------------------------
+jalankan perintah berikut :
+yum -y install wget nano zip unzip net-tools epel-release yum-utils
+
+lakukan update dengan menggunakan perintah berikut :
+yum -y update
+
+membuat repository grafana dengan menjalankan perintah berikut :
+vi /etc/yum.repos.d/grafana.repo
+
+lalu masukan skrip berikut :
+[grafana]
+name=grafana
+baseurl=https://packages.grafana.com/oss/rpm
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+
+kemudian save
+
+membuat cache untuk repositori yum dengan perintah berikut :
+yum makecache fast
+
+lalu lakukan instalasi grafana dengan perintah berikut :
+yum install -y grafana
+
+lakukan start dan enable service grafana perintah berikut :
+systemctl enable --now grafana-server.service
+
+membuka port 3000/tcp untuk akses grafana browser dengan perintah berikut :
+firewall-cmd --permanent --add-port=3000/tcp
+firewall-cmd --reload
+
+jika sudah, buka browser kalian dan masukan http::/ipserverkalian:3000
+
+lalu masukan user dan password grafana
+User: admin
+Pass: admin
+---------------------------------------------------------------------------------------------
