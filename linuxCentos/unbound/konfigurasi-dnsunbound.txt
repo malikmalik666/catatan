@@ -1,0 +1,15 @@
+install dan konfigurasi DNS unbound
+------------------------------------------------------------
+Jalankan perintah berikut untuk mendapatkan packet pendukung :
+yum -y install yum-utils epel-release bind-utils
+-------------------------------------------------------------
+lalu update dengan perintah berikut :
+yum -y update
+-------------------------------------------------------------
+set nama hostname dengan menjalankan perintah berikut :
+nmtui 
+lalu pilih set system hostname
+lalu masukan nama hostname sesuai dengan keinginan anda Misal (ns1.id)
+-------------------------------------------------------------
+lalu lakukan installasi unbound dengan menjalankan perintah berikut :
+yum install unbound
