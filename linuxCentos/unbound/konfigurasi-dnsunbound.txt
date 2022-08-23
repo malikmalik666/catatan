@@ -13,3 +13,124 @@ lalu masukan nama hostname sesuai dengan keinginan anda Misal (ns1.id)
 -------------------------------------------------------------
 lalu lakukan installasi unbound dengan menjalankan perintah berikut :
 yum install unbound
+------------------------------------------------------------
+fle konfigurasi unbound berada di /etc/unbound. Backup file unbound.conf dengan perintah berikut :
+mv /etc/unbound/unbound.conf /etc/unbound/unbound.conf.ori
+------------------------------------------------------------
+buat file unbound.conf yang baru dengan menjalankan perintah berikut
+vi /etc/unbound/unbound.conf
+lalu masukan konfigurasi berikut :
+
+server:
+        verbosity: 1
+        statistics-interval: 0
+        statistics-cumulative: no
+        extended-statistics: yes
+        root-hints: "/etc/unbound/root.server"
+        num-threads: 4
+        do-ip4: yes
+        do-ip6: no
+        do-udp: yes
+        do-tcp: yes
+        so-rcvbuf: 10m
+        so-sndbuf: 10m
+        hide-identity: yes
+        hide-version: yes
+
+interface: 0.0.0.0
+#interface: ::0
+        interface-automatic: no
+
+port: 53
+
+        so-reuseport: yes
+        ip-transparent: yes
+
+
+access-control: 127.0.0.1 allow
+access-control: 0.0.0.0/0 allow
+#access-control: 2001:df0:ec80::/48 allow
+
+        chroot: ""
+        username: "unbound"
+        directory: "/etc/unbound"
+        log-time-ascii: yes
+        pidfile: "/var/run/unbound/unbound.pid"
+        harden-glue: yes
+        harden-dnssec-stripped: yes
+        harden-below-nxdomain: yes
+        harden-referral-path: yes
+        unwanted-reply-threshold: 10000000
+        prefetch: yes
+        prefetch-key: yes
+        rrset-roundrobin: yes
+        minimal-responses: yes
+        module-config: "ipsecmod validator iterator"
+        trust-anchor-signaling: yes
+        trusted-keys-file: /etc/unbound/keys.d/*.key
+        auto-trust-anchor-file: "/var/lib/unbound/root.key"
+        val-clean-additional: yes
+        val-permissive-mode: no
+        val-log-level: 1
+        include: /etc/unbound/local.d/*.conf
+        ipsecmod-enabled: no
+        ipsecmod-hook: "/usr/libexec/ipsec/_unbound-hook"
+python:
+        # Script file to load
+        # python-script: "/etc/unbound/ubmodule-tst.py"
+
+remote-control:
+        control-enable: yes
+        server-key-file: "/etc/unbound/unbound_server.key"
+        server-cert-file: "/etc/unbound/unbound_server.pem"
+        control-key-file: "/etc/unbound/unbound_control.key"
+        control-cert-file: "/etc/unbound/unbound_control.pem"
+
+
+include: /etc/unbound/conf.d/*.conf
+
+
+forward-zone:
+   name: "."
+   forward-addr: 8.8.8.8@53#dns.google
+   forward-addr: 208.67.222.222@53#dns.OpenDNS
+   forward-addr: 208.67.220.220@53#dns.OpenDNS
+   forward-addr: 8.8.4.4@53#dns.google
+--------------------------------------------------------------
+Copy root.server dari Internic dengan perintah berikut :
+wget http://www.internic.net/domain/named.root -O /etc/unbound/root.server 
+kemudian restart service unbound dan enable service unbound dengan perintah berikut :
+systemctl restart unbound
+systemctl enable unbound
+--------------------------------------------------------------
+selanjutnya lakukan testing service unbound dengan command berikut :
+dig facebook.com
+jika tampil keterangan seperti di bawah berarti kita telah selesai membuat dns unbound di server
+
+; <<>> DiG 9.9.4-RedHat-9.9.4-14.el7 <<>> facebook.com 
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 5488
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 3
+ 
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;facebook.com.			IN	A
+ 
+;; ANSWER SECTION:
+facebook.com.		3600	IN	A	173.252.110.27
+ 
+;; AUTHORITY SECTION:
+facebook.com.		172800	IN	NS	a.ns.facebook.com.
+facebook.com.		172800	IN	NS	b.ns.facebook.com.
+ 
+;; ADDITIONAL SECTION:
+a.ns.facebook.com.	172800	IN	A	69.171.239.12
+b.ns.facebook.com.	172800	IN	A	69.171.255.12
+ 
+;; Query time: 569 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Aug 05 03:35:10 EDT 2014
+;; MSG SIZE  rcvd: 124
+
