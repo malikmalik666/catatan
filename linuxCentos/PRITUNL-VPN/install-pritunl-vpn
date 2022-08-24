@@ -1,0 +1,49 @@
+install dan konfigurasi Pritunl VPN
+--------------------------------------------
+lakukan update terlebih dahulu dengan perintah berikut :
+yum -y update
+--------------------------------------------
+membuat repository mongo db dengan perintah beikut :
+
+sudo tee /etc/yum.repos.d/mongodb-org-5.0.repo << EOF
+[mongodb-org-5.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
+EOF
+--------------------------------------------
+membuat repository pritunl dengan perintah berikut :
+
+sudo tee /etc/yum.repos.d/pritunl.repo << EOF
+[pritunl]
+name=Pritunl Repository
+baseurl=https://repo.pritunl.com/stable/yum/oraclelinux/7/
+gpgcheck=1
+enabled=1
+EOF
+--------------------------------------------
+mebambahkan repository epel-release dengan perintah berikut : 
+sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+--------------------------------------------
+menambahkan key untuk memvalidasi instalasi menggunakan perintah beikut :
+gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+
+gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rpm --import key.tmp; rm -f key.tmp
+------------------------------------------
+lalu lakukan installasi pritunl dan mongo db dengan perintah berikut :
+sudo yum -y install pritunl mongodb-org
+
+lakukan start service pritunl dan mongo db dengan perintah berikut :
+sudo systemctl start mongod pritunl
+
+lalu lakukan enable service pritunl dan mongo db dengan perintah berikut :
+sudo systemctl enable mongod pritunl
+------------------------------------------
+allow akses service https dan http dengan perintah berikut :
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+------------------------------------------
+jika sudah menjalankan perintah di atas maka vpn pritunl sudah selesai terinstall. buka browser anda dan masukan ip address server pada browser
