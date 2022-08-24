@@ -53,5 +53,4 @@ pritunl setup-key
 
 untuk mendapatkan user dan password default agar bisa login ke web dashboard pritunl anda perlu menjalankan perintah berikut :
 pritunl default-password
-
 ------------------------------------------
