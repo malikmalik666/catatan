@@ -47,3 +47,11 @@ firewall-cmd --permanent --add-service=https
 firewall-cmd --reload
 ------------------------------------------
 jika sudah menjalankan perintah di atas maka vpn pritunl sudah selesai terinstall. buka browser anda dan masukan ip address server pada browser
+Note :
+untuk mendapatkan key agar bisa masuk ke web dashborad pritunl vpn anda perlu menjalankan perintah berikut :
+pritunl setup-key
+
+untuk mendapatkan user dan password default agar bisa login ke web dashboard pritunl anda perlu menjalankan perintah berikut :
+pritunl default-password
+
+------------------------------------------
