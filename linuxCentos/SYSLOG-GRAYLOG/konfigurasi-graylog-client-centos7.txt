@@ -14,7 +14,7 @@ tambah port yang berjalan di graylog server dengan perintah berikut :
 firewall-cmd --permanent --add-port=(port graylog server)/udp
 firewall-cmd --reload
 -------------------------------------------------------------------------------------------------------------
-talplat rsyslog untuk linux
+tamplate rsyslog untuk linux
 *.* @your-server-ip:5140;RSYSLOG_SyslogProtocol23Format
 $template GRAYLOGRFC5424,"%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% %msg%\n"
 *.* @103.157.144.210:(port graylog);GRAYLOGRFC5424
